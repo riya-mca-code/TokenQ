@@ -538,7 +538,10 @@ app.post("/api/queue", publicLimiter, async (req, res, next) => {
       status: { $in: ["waiting", "serving"] },
       $or: [{ customerMobile }, { customerPhone: customerMobile }],
     }).lean();
-    if (duplicate) return res.status(409).json({ message: "An active token already exists for this mobile number" });
+    if (duplicate) {
+      const summary = await queueSummary(organizationId);
+      return res.status(200).json({ token: duplicate, queue: summary.items, stats: summary });
+    }
 
     const sequence = (await QueueItem.countDocuments({ organizationId })) + 1;
     const token = `${queue.tokenPrefix}${String(sequence).padStart(3, "0")}`;

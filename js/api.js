@@ -1,8 +1,6 @@
 const API_BASE_URL =
   window.API_BASE_URL ||
-  (["localhost", "127.0.0.1", ""].includes(window.location.hostname)
-    ? window.location.origin
-    : "https://tokenq-backend.onrender.com");
+  window.location.origin;
 const AUTH_KEY = "queueflow_jwt";
 const ORG_KEY = "queueflow_org";
 const TENANT_KEY = "queueflow_tenant";
