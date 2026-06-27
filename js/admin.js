@@ -98,7 +98,7 @@ async function refreshManagement() {
 
 async function callNextToken() {
   try {
-    await window.QueueAPI.ensureAuth("Organization Admin");
+    await window.QueueAPI.ensureAuth("Staff");
     const data = await window.QueueAPI.request("/api/org/queue/next", { method: "PATCH", auth: true });
     queueCache = data.queue || [];
     renderQueue();
@@ -110,7 +110,7 @@ async function callNextToken() {
 
 async function completeCurrent() {
   try {
-    await window.QueueAPI.ensureAuth("Organization Admin");
+    await window.QueueAPI.ensureAuth("Staff");
     const data = await window.QueueAPI.request("/api/org/queue/complete", { method: "PATCH", auth: true });
     queueCache = data.queue || [];
     renderQueue();
@@ -122,7 +122,7 @@ async function completeCurrent() {
 
 async function skipCurrent() {
   try {
-    await window.QueueAPI.ensureAuth("Organization Admin");
+    await window.QueueAPI.ensureAuth("Staff");
     const data = await window.QueueAPI.request("/api/org/queue/skip", { method: "PATCH", auth: true });
     queueCache = data.queue || [];
     renderQueue();
@@ -153,6 +153,7 @@ async function exportCSV() {
     const response = await fetch(`${window.QueueAPI.API_BASE_URL}/api/org/export.csv${orgId ? `?organizationId=${encodeURIComponent(orgId)}` : ""}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
+    if (!response.ok) throw new Error("Export failed");
     const text = await response.text();
     const blob = new Blob([text], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -175,7 +176,7 @@ async function searchToken() {
     return;
   }
   try {
-    await window.QueueAPI.ensureAuth("Organization Admin");
+    await window.QueueAPI.ensureAuth("Staff");
     const data = await window.QueueAPI.request(`/api/org/queue/search?q=${encodeURIComponent(value)}`, { auth: true });
     const token = data.item;
     searchResult.className = "state state-success";

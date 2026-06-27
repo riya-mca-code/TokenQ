@@ -113,6 +113,13 @@ superLoginForm?.addEventListener("submit", async (event) => {
 });
 
 if (sessionStorage.getItem(window.QueueAPI.AUTH_KEY)) {
-  showDashboard();
-  loadDashboard().catch(() => {});
+  window.QueueAPI.request("/api/auth/me", { auth: true })
+    .then((data) => {
+      if (data.user?.role === "super_admin") {
+        showDashboard();
+        return loadDashboard();
+      }
+      sessionStorage.removeItem(window.QueueAPI.AUTH_KEY);
+    })
+    .catch(() => {});
 }

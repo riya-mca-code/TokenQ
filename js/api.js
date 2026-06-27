@@ -35,7 +35,8 @@ async function request(path, options = {}) {
   const headers = {};
   const token = sessionStorage.getItem(AUTH_KEY);
   const isSuper = SUPERADMIN_PATH || path.startsWith("/api/super/");
-  const orgId = options.organizationId || (isSuper ? "" : await resolveOrgId());
+  const skipOrg = isSuper || path.startsWith("/api/public/organizations/register") || path.startsWith("/api/public/bootstrap");
+  const orgId = options.organizationId || (skipOrg ? "" : await resolveOrgId());
   const url = new URL(path, getApiUrl("/"));
 
   if (orgId && !isSuper) {
