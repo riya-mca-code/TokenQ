@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QueueFlow - Super Admin</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+</head>
+<body>
+
+<header class="navbar">
+<div class="logo"><i class="fa-solid fa-shield-halved"></i><span>QueueFlow Super Admin</span></div>
+<nav>
+<a href="index.html">Home</a>
+<a href="register.html">Register</a>
+<a href="superadmin.html">Super Admin</a>
+</nav>
+</header>
+
+<section class="hero">
+<h1>System Control</h1>
+<p>Manage organizations, admins, analytics, and audit logs across the entire SaaS.</p>
+</section>
+
+<section class="admin-container" id="superLoginWrap">
+<div class="card">
+<h2>Super Admin Login</h2>
+<form id="superLoginForm" class="form-grid">
+<input class="input" id="superEmail" type="email" placeholder="Email" required>
+<input class="input" id="superPassword" type="password" placeholder="Password" required>
+<button class="btn btn-primary" type="submit">Sign In</button>
+</form>
+<p id="superLoginState" class="state state-empty" role="status" aria-live="polite">Sign in to access system controls.</p>
+</div>
+</section>
+
+<section class="admin-container hidden" id="superDashboard">
+<div class="summary-grid">
+<div class="summary"><span>Organizations</span><strong id="sysOrganizations">0</strong></div>
+<div class="summary"><span>Users</span><strong id="sysUsers">0</strong></div>
+<div class="summary"><span>Queue Items</span><strong id="sysQueueItems">0</strong></div>
+<div class="summary"><span>Audit Logs</span><strong id="sysAuditLogs">0</strong></div>
+</div>
+</section>
+
+<section class="admin-container hidden" id="superDashboardBody">
+<div class="card">
+<h2>Organizations</h2>
+<div id="orgList" class="state state-empty"></div>
+</div>
+</section>
+
+<section class="admin-container hidden" id="superAdminBody">
+<div class="card">
+<h2>Admins</h2>
+<form id="adminForm" class="form-grid">
+<input class="input" id="adminOrgId" placeholder="Organization ID" required>
+<input class="input" id="adminName" placeholder="Admin Name" required>
+<input class="input" id="adminEmail" type="email" placeholder="Admin Email" required>
+<input class="input" id="adminPhone" placeholder="Phone">
+<input class="input" id="adminPassword" type="password" placeholder="Password" required>
+<button class="btn btn-primary" type="submit">Create Admin</button>
+</form>
+<div id="adminList" class="state state-empty"></div>
+</div>
+</section>
+
+<section class="admin-container hidden" id="superLogs">
+<div class="card">
+<h2>Audit Logs</h2>
+<div id="auditLogs" class="logs"></div>
+</div>
+</section>
+
+<script src="js/api.js"></script>
+<script src="js/superadmin.js"></script>
+</body>
+</html>
