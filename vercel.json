@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://YOUR_RENDER_BACKEND.onrender.com/api/$1"
+      "destination": "https://tokenq-backend.onrender.com/api/$1"
     },
     {
       "source": "/socket.io/(.*)",
-      "destination": "https://YOUR_RENDER_BACKEND.onrender.com/socket.io/$1"
+      "destination": "https://tokenq-backend.onrender.com/socket.io/$1"
     }
   ]
 }

@@ -2,8 +2,6 @@
    QueueFlow Analytics Dashboard
 ========================================== */
 
-const THEME_KEY = "queueflow_theme";
-
 const totalTokenCount = document.getElementById("totalTokenCount");
 const waitingCountCard = document.getElementById("waitingCountCard");
 const servingCountCard = document.getElementById("servingCountCard");
@@ -12,16 +10,10 @@ const avgWaitTime = document.getElementById("avgWaitTime");
 const serviceEfficiency = document.getElementById("serviceEfficiency");
 const analyticsTable = document.getElementById("analyticsTable");
 const insightBox = document.getElementById("insightBox");
-const themeToggle = document.getElementById("themeToggle");
-
 const socket = window.QueueAPI.createSocket();
 let statusChart;
 let activityChart;
 let queueCache = [];
-
-function loadTheme() {
-  if (localStorage.getItem(THEME_KEY) === "dark") document.body.classList.add("dark");
-}
 
 function formatTime(date) {
   return new Date(date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -65,6 +57,11 @@ function generateInsights() {
 }
 
 function renderTable() {
+  if (!queueCache.length) {
+    analyticsTable.innerHTML = '<tr class="empty-row"><td colspan="3">No recent records.</td></tr>';
+    return;
+  }
+
   analyticsTable.innerHTML = "";
   queueCache
     .slice()
@@ -73,7 +70,7 @@ function renderTable() {
       const statusClass =
         item.status === "serving" ? "status-serving" : item.status === "completed" ? "status-completed" : "status-waiting";
       const row = document.createElement("tr");
-      row.innerHTML = `<td>${item.token}</td><td class="${statusClass}">${item.status}</td><td>${formatTime(item.createdAt)}</td>`;
+      row.innerHTML = `<td data-label="Token">${item.token}</td><td data-label="Status" class="${statusClass}">${item.status}</td><td data-label="Created">${formatTime(item.createdAt)}</td>`;
       analyticsTable.appendChild(row);
     });
 }
@@ -106,6 +103,7 @@ function renderCharts() {
 }
 
 async function refreshDashboard() {
+  analyticsTable.innerHTML = '<tr class="empty-row"><td colspan="3">Loading analytics…</td></tr>';
   const data = await window.QueueAPI.request("/api/queue");
   queueCache = data.queue || [];
   updateCards();
@@ -116,15 +114,9 @@ async function refreshDashboard() {
   renderCharts();
 }
 
-loadTheme();
 refreshDashboard().catch(() => {});
 
 socket?.on("queue:update", () => refreshDashboard().catch(() => {}));
-
-themeToggle?.addEventListener("click", () => {
-  document.body.classList.toggle("dark");
-  localStorage.setItem(THEME_KEY, document.body.classList.contains("dark") ? "dark" : "light");
-});
 
 /* ==========================================
    End File

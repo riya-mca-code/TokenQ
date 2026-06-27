@@ -1,4 +1,8 @@
-const API_BASE_URL = window.API_BASE_URL || "";
+const API_BASE_URL =
+  window.API_BASE_URL ||
+  (["localhost", "127.0.0.1", ""].includes(window.location.hostname)
+    ? window.location.origin
+    : "https://tokenq-backend.onrender.com");
 const AUTH_KEY = "queueflow_jwt";
 
 function getApiUrl(path) {
@@ -7,7 +11,7 @@ function getApiUrl(path) {
 
 async function request(path, options = {}) {
   const headers = {};
-  const token = localStorage.getItem(AUTH_KEY);
+  const token = sessionStorage.getItem(AUTH_KEY);
 
   if (options.body) headers["Content-Type"] = "application/json";
   if (options.auth && token) headers.Authorization = `Bearer ${token}`;
@@ -29,17 +33,17 @@ async function login(username, password) {
     body: { username, password },
   });
 
-  localStorage.setItem(AUTH_KEY, data.token);
+  sessionStorage.setItem(AUTH_KEY, data.token);
   return data;
 }
 
 async function ensureAuth(roleLabel) {
-  if (localStorage.getItem(AUTH_KEY)) {
+  if (sessionStorage.getItem(AUTH_KEY)) {
     try {
       await request("/api/auth/me", { auth: true });
-      return localStorage.getItem(AUTH_KEY);
+      return sessionStorage.getItem(AUTH_KEY);
     } catch {
-      localStorage.removeItem(AUTH_KEY);
+      sessionStorage.removeItem(AUTH_KEY);
     }
   }
 

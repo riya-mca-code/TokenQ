@@ -2,8 +2,6 @@
    QueueFlow Admin Dashboard
 ========================================== */
 
-const THEME_KEY = "queueflow_theme";
-
 const servingToken = document.getElementById("servingToken");
 const waitingCustomers = document.getElementById("waitingCustomers");
 const totalTokens = document.getElementById("totalTokens");
@@ -17,14 +15,8 @@ const searchInput = document.getElementById("searchInput");
 const searchBtn = document.getElementById("searchBtn");
 const searchResult = document.getElementById("searchResult");
 const activityLogs = document.getElementById("activityLogs");
-const themeToggle = document.getElementById("themeToggle");
-
 const socket = window.QueueAPI.createSocket();
 let queueCache = [];
-
-function loadTheme() {
-  if (localStorage.getItem(THEME_KEY) === "dark") document.body.classList.add("dark");
-}
 
 function addLog(message) {
   const li = document.createElement("li");
@@ -48,18 +40,25 @@ function updateStats() {
 }
 
 function renderQueue() {
+  if (!queueCache.length) {
+    adminQueueTable.innerHTML = '<tr class="empty-row"><td colspan="3">No queue entries yet.</td></tr>';
+    updateStats();
+    return;
+  }
+
   adminQueueTable.innerHTML = "";
   queueCache.forEach((item) => {
     const statusClass =
       item.status === "serving" ? "status-serving" : item.status === "completed" ? "status-completed" : "status-waiting";
     const row = document.createElement("tr");
-    row.innerHTML = `<td>${item.token}</td><td class="${statusClass}">${item.status}</td><td>${formatTime(item.createdAt)}</td>`;
+    row.innerHTML = `<td data-label="Token">${item.token}</td><td data-label="Status" class="${statusClass}">${item.status}</td><td data-label="Created">${formatTime(item.createdAt)}</td>`;
     adminQueueTable.appendChild(row);
   });
   updateStats();
 }
 
 async function refresh() {
+  adminQueueTable.innerHTML = '<tr class="empty-row"><td colspan="3">Loading queue…</td></tr>';
   const data = await window.QueueAPI.request("/api/queue");
   queueCache = data.queue || [];
   renderQueue();
@@ -97,7 +96,7 @@ async function resetQueue() {
     const data = await window.QueueAPI.request("/api/queue", { method: "DELETE", auth: true });
     queueCache = data.queue || [];
     renderQueue();
-    localStorage.removeItem("myToken");
+    sessionStorage.removeItem("myToken");
     addLog(data.message || "Queue reset completed");
   } catch (error) {
     alert(error.message);
@@ -124,28 +123,25 @@ async function exportCSV() {
 function searchToken() {
   const value = searchInput.value.trim().toUpperCase();
   if (!value) {
+    searchResult.className = "state state-empty";
     searchResult.innerHTML = "Enter token number";
     return;
   }
 
   const token = queueCache.find((q) => q.token === value);
   if (!token) {
+    searchResult.className = "state state-error";
     searchResult.innerHTML = "<p>Token not found</p>";
     return;
   }
 
+  searchResult.className = "state state-success";
   searchResult.innerHTML = `<div><h3>${token.token}</h3><p>Status: <strong>${token.status}</strong></p><p>Created: ${formatTime(token.createdAt)}</p></div>`;
 }
 
-loadTheme();
 refresh().catch(() => {});
 
 socket?.on("queue:update", () => refresh().catch(() => {}));
-
-themeToggle?.addEventListener("click", () => {
-  document.body.classList.toggle("dark");
-  localStorage.setItem(THEME_KEY, document.body.classList.contains("dark") ? "dark" : "light");
-});
 
 nextTokenBtn?.addEventListener("click", callNextToken);
 completeTokenBtn?.addEventListener("click", completeCurrent);

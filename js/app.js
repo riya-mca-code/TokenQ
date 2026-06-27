@@ -1,4 +1,3 @@
-const THEME_KEY = "queueflow_theme";
 const MY_TOKEN_KEY = "myToken";
 
 const generateTokenBtn = document.getElementById("generateTokenBtn");
@@ -9,23 +8,27 @@ const estimatedWait = document.getElementById("estimatedWait");
 const tokenDisplay = document.getElementById("tokenDisplay");
 const tokenMessage = document.getElementById("tokenMessage");
 const queueTable = document.getElementById("queueTable");
-const themeToggle = document.getElementById("themeToggle");
-
 const socket = window.QueueAPI.createSocket();
 
 function formatTime(date) {
   return new Date(date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-function loadTheme() {
-  if (localStorage.getItem(THEME_KEY) === "dark") document.body.classList.add("dark");
+function setTokenState(type, message) {
+  tokenMessage.className = `state state-${type}`;
+  tokenMessage.textContent = message;
 }
 
 function renderQueue(queue) {
+  if (!queue.length) {
+    queueTable.innerHTML = '<tr class="empty-row"><td colspan="3">No queue entries yet.</td></tr>';
+    return;
+  }
+
   queueTable.innerHTML = "";
   queue.forEach((item) => {
     const row = document.createElement("tr");
-    row.innerHTML = `<td>${item.token}</td><td>${item.status}</td><td>${formatTime(item.createdAt)}</td>`;
+    row.innerHTML = `<td data-label="Token">${item.token}</td><td data-label="Status">${item.status}</td><td data-label="Created">${formatTime(item.createdAt)}</td>`;
     queueTable.appendChild(row);
   });
 }
@@ -34,7 +37,7 @@ function renderDashboard(queue) {
   const activeQueue = queue.filter((item) => item.status !== "completed");
   const serving = activeQueue.find((item) => item.status === "serving");
   const waiting = activeQueue.filter((item) => item.status === "waiting");
-  const myToken = localStorage.getItem(MY_TOKEN_KEY);
+  const myToken = sessionStorage.getItem(MY_TOKEN_KEY);
   const myIndex = activeQueue.findIndex((item) => item.token === myToken);
 
   currentServing.textContent = serving ? serving.token : "A000";
@@ -44,6 +47,7 @@ function renderDashboard(queue) {
 }
 
 async function refresh() {
+  queueTable.innerHTML = '<tr class="empty-row"><td colspan="3">Loading queue…</td></tr>';
   const data = await window.QueueAPI.request("/api/queue");
   const queue = data.queue || [];
   renderDashboard(queue);
@@ -55,25 +59,19 @@ async function generateToken() {
     const data = await window.QueueAPI.request("/api/queue", { method: "POST" });
     const queue = data.queue || [];
     if (data.token?.token) {
-      localStorage.setItem(MY_TOKEN_KEY, data.token.token);
+      sessionStorage.setItem(MY_TOKEN_KEY, data.token.token);
       tokenDisplay.textContent = data.token.token;
     }
-    tokenMessage.textContent = "Token generated successfully";
+    setTokenState("success", "Token generated successfully");
     renderDashboard(queue);
     renderQueue(queue);
   } catch (error) {
-    tokenMessage.textContent = error.message;
+    setTokenState("error", error.message);
   }
 }
 
-loadTheme();
 refresh().catch(() => {});
 
 socket?.on("queue:update", () => refresh().catch(() => {}));
-
-themeToggle?.addEventListener("click", () => {
-  document.body.classList.toggle("dark");
-  localStorage.setItem(THEME_KEY, document.body.classList.contains("dark") ? "dark" : "light");
-});
 
 generateTokenBtn?.addEventListener("click", generateToken);
