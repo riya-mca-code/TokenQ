@@ -1,11 +1,9 @@
-/* ==========================================
-   QueueFlow Analytics Dashboard
-========================================== */
-
 const totalTokenCount = document.getElementById("totalTokenCount");
 const waitingCountCard = document.getElementById("waitingCountCard");
 const servingCountCard = document.getElementById("servingCountCard");
 const completedCountCard = document.getElementById("completedCountCard");
+const skippedCountCard = document.getElementById("skippedCountCard");
+const missedCountCard = document.getElementById("missedCountCard");
 const avgWaitTime = document.getElementById("avgWaitTime");
 const serviceEfficiency = document.getElementById("serviceEfficiency");
 const analyticsTable = document.getElementById("analyticsTable");
@@ -20,10 +18,14 @@ function formatTime(date) {
 }
 
 function getStats() {
-  const waiting = queueCache.filter((q) => q.status === "waiting").length;
-  const serving = queueCache.filter((q) => q.status === "serving").length;
-  const completed = queueCache.filter((q) => q.status === "completed").length;
-  return { total: queueCache.length, waiting, serving, completed };
+  const counts = queueCache.reduce(
+    (acc, item) => {
+      acc[item.status] = (acc[item.status] || 0) + 1;
+      return acc;
+    },
+    { waiting: 0, serving: 0, completed: 0, skipped: 0, missed: 0 }
+  );
+  return { total: queueCache.length, ...counts };
 }
 
 function updateCards() {
@@ -32,15 +34,18 @@ function updateCards() {
   waitingCountCard.textContent = stats.waiting;
   servingCountCard.textContent = stats.serving;
   completedCountCard.textContent = stats.completed;
+  skippedCountCard.textContent = stats.skipped;
+  missedCountCard.textContent = stats.missed;
 }
 
 function calculateWaitTime() {
-  avgWaitTime.textContent = `${getStats().waiting * 5} Min`;
+  const stats = getStats();
+  avgWaitTime.textContent = `${stats.waiting * 5} Min`;
 }
 
 function calculateEfficiency() {
   const stats = getStats();
-  serviceEfficiency.textContent = stats.total === 0 ? "0%" : `${Math.round((stats.completed / stats.total) * 100)}%`;
+  serviceEfficiency.textContent = stats.total === 0 ? "0%" : `${Math.round(((stats.completed + stats.skipped) / stats.total) * 100)}%`;
 }
 
 function generateInsights() {
@@ -50,6 +55,8 @@ function generateInsights() {
       ? "No queue records available."
       : stats.waiting > 10
       ? "Queue congestion detected. Consider opening additional service counters."
+      : stats.missed > 0
+      ? "Missed tokens detected. Review queue calling workflow."
       : stats.completed > stats.waiting
       ? "Service performance is healthy and customers are being processed efficiently."
       : "Queue activity is normal. Continue monitoring service throughput.";
@@ -67,8 +74,7 @@ function renderTable() {
     .slice()
     .reverse()
     .forEach((item) => {
-      const statusClass =
-        item.status === "serving" ? "status-serving" : item.status === "completed" ? "status-completed" : "status-waiting";
+      const statusClass = item.status === "serving" ? "status-serving" : item.status === "completed" ? "status-completed" : "status-waiting";
       const row = document.createElement("tr");
       row.innerHTML = `<td data-label="Token">${item.token}</td><td data-label="Status" class="${statusClass}">${item.status}</td><td data-label="Created">${formatTime(item.createdAt)}</td>`;
       analyticsTable.appendChild(row);
@@ -86,8 +92,13 @@ function renderCharts() {
   statusChart = new Chart(statusCtx, {
     type: "doughnut",
     data: {
-      labels: ["Waiting", "Serving", "Completed"],
-      datasets: [{ data: [stats.waiting, stats.serving, stats.completed], backgroundColor: ["#f59e0b", "#16a34a", "#2563eb"] }],
+      labels: ["Waiting", "Serving", "Completed", "Skipped", "Missed"],
+      datasets: [
+        {
+          data: [stats.waiting, stats.serving, stats.completed, stats.skipped, stats.missed],
+          backgroundColor: ["#f59e0b", "#16a34a", "#2563eb", "#64748b", "#dc2626"],
+        },
+      ],
     },
     options: { responsive: true, plugins: { legend: { position: "bottom" } } },
   });
@@ -95,15 +106,15 @@ function renderCharts() {
   activityChart = new Chart(activityCtx, {
     type: "bar",
     data: {
-      labels: ["Waiting", "Serving", "Completed"],
-      datasets: [{ label: "Queue Count", data: [stats.waiting, stats.serving, stats.completed], backgroundColor: ["#f59e0b", "#16a34a", "#2563eb"] }],
+      labels: ["Waiting", "Serving", "Completed", "Skipped", "Missed"],
+      datasets: [{ label: "Queue Count", data: [stats.waiting, stats.serving, stats.completed, stats.skipped, stats.missed], backgroundColor: ["#f59e0b", "#16a34a", "#2563eb", "#64748b", "#dc2626"] }],
     },
     options: { responsive: true, scales: { y: { beginAtZero: true } } },
   });
 }
 
 async function refreshDashboard() {
-  analyticsTable.innerHTML = '<tr class="empty-row"><td colspan="3">Loading analytics…</td></tr>';
+  analyticsTable.innerHTML = '<tr class="empty-row"><td colspan="3">Loading analytics...</td></tr>';
   const data = await window.QueueAPI.request("/api/queue");
   queueCache = data.queue || [];
   updateCards();
@@ -115,9 +126,4 @@ async function refreshDashboard() {
 }
 
 refreshDashboard().catch(() => {});
-
 socket?.on("queue:update", () => refreshDashboard().catch(() => {}));
-
-/* ==========================================
-   End File
-========================================== */
