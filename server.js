@@ -105,6 +105,8 @@ const queueItemSchema = new mongoose.Schema(
     customerMobile: { type: String, required: true, trim: true },
     customerEmail: { type: String, default: "" },
     purpose: { type: String, default: "" },
+    createdBy: { type: String, default: "customer" },
+    customerPhone: { type: String, required: true, trim: true },
     status: {
       type: String,
       enum: ["waiting", "serving", "completed", "skipped", "missed"],
@@ -181,6 +183,21 @@ function signJwt(user) {
     JWT_SECRET,
     { expiresIn: "8h" }
   );
+}
+
+function signTenantToken(organizationId) {
+  return jwt.sign({ organizationId: toId(organizationId), role: "customer" }, JWT_SECRET, { expiresIn: "7d" });
+}
+
+function verifyTenantToken(req) {
+  const token = req.headers["x-tenant-token"];
+  if (!token) return "";
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+    return payload.organizationId || "";
+  } catch {
+    return "";
+  }
 }
 
 function auth(req, res, next) {
@@ -331,6 +348,7 @@ app.get("/api/public/bootstrap", async (req, res, next) => {
       organizationId: toId(org._id),
       businessName: org.businessName,
       businessType: org.businessType,
+      tenantToken: signTenantToken(org._id),
     });
   } catch (error) {
     next(error);
@@ -409,6 +427,7 @@ app.post("/api/public/organizations/register", publicLimiter, async (req, res, n
       queue: { id: toId(queue._id), name: queue.name },
       counter: { id: toId(counter._id), name: counter.name },
       token,
+      tenantToken: signTenantToken(org._id),
     });
     emitSuperUpdate();
   } catch (error) {
@@ -481,8 +500,8 @@ app.get("/api/public/organizations/:organizationId", async (req, res, next) => {
 
 app.get("/api/queue", async (req, res, next) => {
   try {
-    const organizationId = normalizeOrgId(req);
-    if (!organizationId) return res.status(400).json({ message: "Organization is required" });
+    const organizationId = verifyTenantToken(req);
+    if (!organizationId) return res.status(401).json({ message: "Unauthorized" });
     const org = await Organization.findById(organizationId);
     if (!org) return res.status(404).json({ message: "Organization not found" });
 
@@ -496,13 +515,13 @@ app.get("/api/queue", async (req, res, next) => {
 
 app.post("/api/queue", publicLimiter, async (req, res, next) => {
   try {
-    const organizationId = normalizeOrgId(req);
+    const organizationId = verifyTenantToken(req);
     const customerName = parseBodyString(req.body.customerName);
     const customerMobile = parseBodyString(req.body.customerMobile);
     const customerEmail = parseBodyString(req.body.customerEmail).toLowerCase();
     const purpose = parseBodyString(req.body.purpose);
 
-    if (!organizationId) return res.status(400).json({ message: "Organization is required" });
+    if (!organizationId) return res.status(401).json({ message: "Unauthorized" });
     if (!customerName || !customerMobile) return res.status(400).json({ message: "Customer name and mobile are required" });
     if (customerEmail && !validateEmail(customerEmail)) return res.status(400).json({ message: "Invalid customer email" });
     if (!validatePhone(customerMobile)) return res.status(400).json({ message: "Invalid mobile number" });
@@ -513,6 +532,13 @@ app.post("/api/queue", publicLimiter, async (req, res, next) => {
 
     const queue = await getDefaultQueue(organizationId);
     if (!queue) return res.status(400).json({ message: "Default queue not configured" });
+
+    const duplicate = await QueueItem.findOne({
+      organizationId,
+      status: { $in: ["waiting", "serving"] },
+      $or: [{ customerMobile }, { customerPhone: customerMobile }],
+    }).lean();
+    if (duplicate) return res.status(409).json({ message: "An active token already exists for this mobile number" });
 
     const sequence = (await QueueItem.countDocuments({ organizationId })) + 1;
     const token = `${queue.tokenPrefix}${String(sequence).padStart(3, "0")}`;
@@ -526,8 +552,10 @@ app.post("/api/queue", publicLimiter, async (req, res, next) => {
       sequence,
       customerName,
       customerMobile,
+      customerPhone: customerMobile,
       customerEmail,
       purpose,
+      createdBy: "customer",
       status: "waiting",
     });
 
@@ -999,7 +1027,7 @@ async function start() {
   await seedSuperAdmin();
   const defaultOrg = await ensureDefaultOrg();
   io.emit("queue:update", { organizationId: toId(defaultOrg._id) });
-  server.listen(PORT, () => console.log(`TokenQ running on port ${PORT}`));
+  server.listen(PORT);
 }
 
 start().catch((error) => {

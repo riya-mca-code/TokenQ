@@ -24,6 +24,8 @@ const counterList = document.getElementById("counterList");
 const socket = window.QueueAPI.createSocket();
 let queueCache = [];
 
+window.RouteGuard?.enforceRole("Staff", ["staff", "org_admin"]);
+
 function addLog(message) {
   const li = document.createElement("li");
   li.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;

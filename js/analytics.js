@@ -13,6 +13,8 @@ let statusChart;
 let activityChart;
 let queueCache = [];
 
+window.RouteGuard?.enforceRole("Organization Admin", ["org_admin"]);
+
 function formatTime(date) {
   return new Date(date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
