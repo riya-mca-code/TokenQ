@@ -1,4 +1,4 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { env } from "../config/env";
 import {
   clearAuthCookie,
@@ -23,7 +23,7 @@ function setAuthCookie(res: Response, token: string) {
   });
 }
 
-export async function registerController(req: Request, res: Response, next: Function) {
+export async function registerController(req: Request, res: Response, next: NextFunction) {
   try {
     const result = await registerOrganization({
       businessName: req.body.businessName,
@@ -44,7 +44,7 @@ export async function registerController(req: Request, res: Response, next: Func
   }
 }
 
-export async function loginController(req: Request, res: Response, next: Function) {
+export async function loginController(req: Request, res: Response, next: NextFunction) {
   try {
     const result = await loginUser({
       email: req.body.email,
@@ -66,7 +66,7 @@ export async function logoutController(req: Request, res: Response) {
   return sendSuccess(res, "Logged out successfully", {});
 }
 
-export async function meController(req: Request, res: Response, next: Function) {
+export async function meController(req: Request, res: Response, next: NextFunction) {
   try {
     if (!req.auth) return sendError(res, 401, "Authentication required");
     const result = await getCurrentUser(req.auth.id);
@@ -76,7 +76,7 @@ export async function meController(req: Request, res: Response, next: Function) 
   }
 }
 
-export async function forgotPasswordController(req: Request, res: Response, next: Function) {
+export async function forgotPasswordController(req: Request, res: Response, next: NextFunction) {
   try {
     const result = await forgotPassword({
       email: req.body.email,
@@ -89,7 +89,7 @@ export async function forgotPasswordController(req: Request, res: Response, next
   }
 }
 
-export async function resetPasswordController(req: Request, res: Response, next: Function) {
+export async function resetPasswordController(req: Request, res: Response, next: NextFunction) {
   try {
     const result = await resetPassword({
       token: req.body.token,

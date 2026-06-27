@@ -16,31 +16,31 @@ Status:
 
 # Milestone 1 — Foundation
 
-Status: TODO
+Status: DONE
 
 ## Project Setup
 
-☐ Next.js
+☑ Next.js
 
-☐ TypeScript
+☑ TypeScript
 
-☐ Tailwind CSS
+☑ Tailwind CSS
 
-☐ shadcn/ui
+☑ shadcn/ui
 
-☐ Express
+☑ Express
 
-☐ MongoDB
+☑ MongoDB
 
-☐ Mongoose
+☑ Mongoose
 
-☐ Socket.IO
+☑ Socket.IO
 
-☐ Environment Variables
+☑ Environment Variables
 
-☐ Folder Structure
+☑ Folder Structure
 
-☐ Documentation
+☑ Documentation
 
 Deliverable
 
@@ -50,25 +50,25 @@ Production-ready project structure.
 
 # Milestone 2 — Authentication
 
-Status: TODO
+Status: DONE
 
-☐ Organization Registration
+☑ Organization Registration
 
-☐ Login
+☑ Login
 
-☐ Logout
+☑ Logout
 
-☐ Forgot Password
+☑ Forgot Password
 
-☐ Reset Password
+☑ Reset Password
 
-☐ JWT
+☑ JWT
 
-☐ Password Hashing
+☑ Password Hashing
 
-☐ Protected Routes
+☑ Protected Routes
 
-☐ Role Middleware
+☑ Role Middleware
 
 Deliverable
 
@@ -78,19 +78,19 @@ Secure authentication system.
 
 # Milestone 3 — Multi-Tenancy
 
-Status: TODO
+Status: DONE
 
-☐ Organization Model
+☑ Organization Model
 
-☐ Organization Isolation
+☑ Organization Isolation
 
-☐ Organization Middleware
+☑ Organization Middleware
 
-☐ Organization Dashboard
+☑ Organization Dashboard
 
-☐ Default Workspace
+☑ Default Workspace
 
-☐ Branding
+☑ Branding
 
 Deliverable
 

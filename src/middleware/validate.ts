@@ -14,9 +14,10 @@ export function validate(schema: ZodSchema) {
       return sendError(res, 422, result.error.issues[0]?.message || "Validation error");
     }
 
-    req.body = result.data.body;
-    req.query = result.data.query;
-    req.params = result.data.params;
+    const data = result.data as { body: unknown; query: unknown; params: unknown };
+    req.body = data.body as any;
+    req.query = data.query as any;
+    req.params = data.params as any;
     return next();
   };
 }

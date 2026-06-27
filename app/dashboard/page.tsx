@@ -8,7 +8,7 @@ import { StatCard } from "@/components/layout/stat-card";
 import { EmptyState } from "@/components/layout/empty-state";
 
 async function getDashboardData() {
-  const token = getSessionToken();
+  const token = await getSessionToken();
   if (!token) {
     redirect("/login");
   }

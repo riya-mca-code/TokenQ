@@ -13,7 +13,7 @@ router.get(
   authRequired,
   allowRoles("SUPER_ADMIN"),
   (req, res, next) => {
-    req.organizationId = req.params.organizationId;
+    req.organizationId = typeof req.params.organizationId === "string" ? req.params.organizationId : undefined;
     next();
   },
   currentOrganizationController

@@ -21,12 +21,12 @@ export const registerSchema = z.object({
 export const loginSchema = z.object({
   email: z.string().email("Enter a valid email"),
   password: z.string().min(1, "Password is required"),
-  organizationSlug: z.preprocess((value) => (value === "" ? undefined : value), z.string().min(1).optional()),
+  organizationSlug: z.string().optional(),
 });
 
 export const forgotPasswordSchema = z.object({
   email: z.string().email("Enter a valid email"),
-  organizationSlug: z.preprocess((value) => (value === "" ? undefined : value), z.string().min(1).optional()),
+  organizationSlug: z.string().optional(),
 });
 
 export const resetPasswordSchema = z

@@ -11,6 +11,8 @@ import { normalizeEmail, normalizeText } from "../utils/http";
 import { slugify } from "../utils/slug";
 import { writeAuditLog } from "../utils/audit";
 
+const AUTH_COOKIE_NAME = "tokenq_session";
+
 function passwordRegex(password: string) {
   return /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}/.test(password);
 }

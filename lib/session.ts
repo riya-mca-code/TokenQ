@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { AUTH_COOKIE_NAME } from "./constants";
 
-export function getSessionToken() {
-  return cookies().get(AUTH_COOKIE_NAME)?.value || "";
+export async function getSessionToken() {
+  const cookieStore = await cookies();
+  return cookieStore.get(AUTH_COOKIE_NAME)?.value || "";
 }

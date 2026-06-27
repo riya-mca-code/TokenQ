@@ -1,4 +1,4 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { Organization } from "../models/Organization";
 import { getDashboardOverview } from "../services/organization.service";
 import { sendError, sendSuccess } from "../utils/response";
@@ -25,7 +25,7 @@ export async function currentOrganizationController(req: Request, res: Response)
   });
 }
 
-export async function dashboardOverviewController(req: Request, res: Response, next: Function) {
+export async function dashboardOverviewController(req: Request, res: Response, next: NextFunction) {
   try {
     if (!req.auth) return sendError(res, 401, "Authentication required");
     const result = await getDashboardOverview(req.auth.id, req.organizationId || req.auth.organizationId);

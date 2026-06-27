@@ -10,8 +10,8 @@ export function signAuthToken(session: AuthSession) {
       role: session.role,
       email: session.email,
     },
-    env.jwtSecret,
-    { expiresIn: env.jwtExpiresIn }
+    env.jwtSecret as jwt.Secret,
+    { expiresIn: env.jwtExpiresIn as jwt.SignOptions["expiresIn"] }
   );
 }
 

@@ -1,0 +1,3 @@
+module.exports=[76898,a=>{a.v({className:"inter_b2991b2-module__9mH_6q__className",variable:"inter_b2991b2-module__9mH_6q__variable"})},33290,a=>{"use strict";var b=a.i(7997),c=a.i(76898);let d={className:c.default.className,style:{fontFamily:"'Inter', 'Inter Fallback'",fontStyle:"normal"}};null!=c.default.variable&&(d.variable=c.default.variable),a.s(["default",0,function({children:a}){return(0,b.jsx)("html",{lang:"en",className:d.variable,children:(0,b.jsx)("body",{className:"font-sans text-slate-900 antialiased",children:a})})},"metadata",0,{title:"TokenQ",description:"Multi-tenant queue management SaaS"}],33290)},70864,a=>{a.n(a.i(33290))}];
+
+//# sourceMappingURL=%5Broot-of-the-server%5D__0xk9tsd._.js.map

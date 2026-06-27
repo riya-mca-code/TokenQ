@@ -4,7 +4,8 @@ import { AUTH_COOKIE_NAME } from "@/lib/constants";
 import { clearSessionCookie, forwardJson } from "../_shared";
 
 export async function POST() {
-  const token = cookies().get(AUTH_COOKIE_NAME)?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
 
   if (token) {
     await forwardJson("/api/v1/auth/logout", {}, token);

@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { PageHeader } from "@/components/layout/page-header";
 
 async function getSettingsData() {
-  const token = getSessionToken();
+  const token = await getSessionToken();
   if (!token) redirect("/login");
 
   const response = await backendFetch("/api/v1/organizations/current", {}, token);
