@@ -138,9 +138,9 @@ function searchToken() {
 }
 
 loadTheme();
-refresh();
+refresh().catch(() => {});
 
-socket?.on("queue:update", refresh);
+socket?.on("queue:update", () => refresh().catch(() => {}));
 
 themeToggle?.addEventListener("click", () => {
   document.body.classList.toggle("dark");

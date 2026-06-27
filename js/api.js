@@ -34,7 +34,14 @@ async function login(username, password) {
 }
 
 async function ensureAuth(roleLabel) {
-  if (localStorage.getItem(AUTH_KEY)) return localStorage.getItem(AUTH_KEY);
+  if (localStorage.getItem(AUTH_KEY)) {
+    try {
+      await request("/api/auth/me", { auth: true });
+      return localStorage.getItem(AUTH_KEY);
+    } catch {
+      localStorage.removeItem(AUTH_KEY);
+    }
+  }
 
   const username = prompt(`${roleLabel} username`);
   if (!username) return null;

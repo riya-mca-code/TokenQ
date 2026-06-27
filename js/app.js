@@ -31,10 +31,11 @@ function renderQueue(queue) {
 }
 
 function renderDashboard(queue) {
-  const serving = queue.find((item) => item.status === "serving");
-  const waiting = queue.filter((item) => item.status === "waiting");
+  const activeQueue = queue.filter((item) => item.status !== "completed");
+  const serving = activeQueue.find((item) => item.status === "serving");
+  const waiting = activeQueue.filter((item) => item.status === "waiting");
   const myToken = localStorage.getItem(MY_TOKEN_KEY);
-  const myIndex = queue.findIndex((item) => item.token === myToken && item.status !== "completed");
+  const myIndex = activeQueue.findIndex((item) => item.token === myToken);
 
   currentServing.textContent = serving ? serving.token : "A000";
   waitingCount.textContent = waiting.length;
@@ -66,9 +67,9 @@ async function generateToken() {
 }
 
 loadTheme();
-refresh();
+refresh().catch(() => {});
 
-socket?.on("queue:update", refresh);
+socket?.on("queue:update", () => refresh().catch(() => {}));
 
 themeToggle?.addEventListener("click", () => {
   document.body.classList.toggle("dark");

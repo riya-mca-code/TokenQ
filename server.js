@@ -106,6 +106,10 @@ app.post("/api/auth/login", authLimiter, async (req, res, next) => {
   }
 });
 
+app.get("/api/auth/me", authenticate, (req, res) => {
+  res.json({ user: req.user });
+});
+
 app.get("/api/queue", async (req, res, next) => {
   try {
     await sendQueue(res);

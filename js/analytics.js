@@ -117,9 +117,9 @@ async function refreshDashboard() {
 }
 
 loadTheme();
-refreshDashboard();
+refreshDashboard().catch(() => {});
 
-socket?.on("queue:update", refreshDashboard);
+socket?.on("queue:update", () => refreshDashboard().catch(() => {}));
 
 themeToggle?.addEventListener("click", () => {
   document.body.classList.toggle("dark");
