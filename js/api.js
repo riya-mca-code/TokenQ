@@ -43,6 +43,8 @@ async function request(path, options = {}) {
       url.searchParams.set("organizationId", orgId);
     } else if (path !== "/api/public/organizations/register" && path !== "/api/auth/login") {
       options.body = { ...(options.body || {}), organizationId: options.body?.organizationId || orgId };
+    } else if (path === "/api/auth/login") {
+      options.body = { ...(options.body || {}), organizationId: options.body?.organizationId || orgId };
     }
     headers["X-Organization-Id"] = orgId;
   }
@@ -115,4 +117,4 @@ async function registerOrganization(payload) {
   return data;
 }
 
-window.QueueAPI = { request, login, ensureAuth, registerOrganization, AUTH_KEY, createSocket, getCurrentOrgId, resolveOrgId, ORG_KEY };
+window.QueueAPI = { request, login, ensureAuth, registerOrganization, AUTH_KEY, createSocket, getCurrentOrgId, resolveOrgId, ORG_KEY, API_BASE_URL };

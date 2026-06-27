@@ -55,7 +55,15 @@ function renderQueue() {
   adminQueueTable.innerHTML = "";
   queueCache.forEach((item) => {
     const statusClass =
-      item.status === "serving" ? "status-serving" : item.status === "completed" ? "status-completed" : item.status === "waiting" ? "status-waiting" : "status-completed";
+      item.status === "serving"
+        ? "status-serving"
+        : item.status === "completed"
+        ? "status-completed"
+        : item.status === "skipped"
+        ? "status-skipped"
+        : item.status === "missed"
+        ? "status-missed"
+        : "status-waiting";
     const row = document.createElement("tr");
     row.innerHTML = `<td data-label="Token">${item.token}</td><td data-label="Status" class="${statusClass}">${item.status}</td><td data-label="Created">${formatTime(item.createdAt)}</td>`;
     adminQueueTable.appendChild(row);
@@ -142,7 +150,7 @@ async function exportCSV() {
     await window.QueueAPI.ensureAuth("Organization Admin");
     const token = sessionStorage.getItem(window.QueueAPI.AUTH_KEY);
     const orgId = window.QueueAPI.getCurrentOrgId();
-    const response = await fetch(`${window.API_BASE_URL || window.location.origin}/api/org/export.csv${orgId ? `?organizationId=${encodeURIComponent(orgId)}` : ""}`, {
+    const response = await fetch(`${window.QueueAPI.API_BASE_URL}/api/org/export.csv${orgId ? `?organizationId=${encodeURIComponent(orgId)}` : ""}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     const text = await response.text();

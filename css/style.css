@@ -249,6 +249,12 @@ tbody tr:last-child td{border-bottom:none}
 .status-waiting{color:var(--warning);font-weight:700}
 .status-serving{color:var(--success);font-weight:700}
 .status-completed{color:var(--danger);font-weight:700}
+.status-skipped{color:#64748b;font-weight:700}
+.status-missed{color:var(--danger);font-weight:700}
+
+.hidden{
+  display:none;
+}
 
 .admin-actions{
   display:grid;

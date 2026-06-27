@@ -12,11 +12,21 @@ services:
         sync: false
       - key: CORS_ORIGIN
         sync: false
-      - key: ADMIN_USERNAME
+      - key: SUPER_ADMIN_EMAIL
         sync: false
-      - key: ADMIN_PASSWORD
+      - key: SUPER_ADMIN_PASSWORD
         sync: false
-      - key: STAFF_USERNAME
+      - key: SUPER_ADMIN_NAME
         sync: false
-      - key: STAFF_PASSWORD
+      - key: DEFAULT_ORG_NAME
+        sync: false
+      - key: DEFAULT_ORG_TYPE
+        sync: false
+      - key: DEFAULT_OWNER_NAME
+        sync: false
+      - key: DEFAULT_ORG_EMAIL
+        sync: false
+      - key: DEFAULT_ORG_PHONE
+        sync: false
+      - key: DEFAULT_ORG_PASSWORD
         sync: false

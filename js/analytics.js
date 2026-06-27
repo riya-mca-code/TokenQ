@@ -74,7 +74,16 @@ function renderTable() {
     .slice()
     .reverse()
     .forEach((item) => {
-      const statusClass = item.status === "serving" ? "status-serving" : item.status === "completed" ? "status-completed" : "status-waiting";
+      const statusClass =
+        item.status === "serving"
+          ? "status-serving"
+          : item.status === "completed"
+          ? "status-completed"
+          : item.status === "skipped"
+          ? "status-skipped"
+          : item.status === "missed"
+          ? "status-missed"
+          : "status-waiting";
       const row = document.createElement("tr");
       row.innerHTML = `<td data-label="Token">${item.token}</td><td data-label="Status" class="${statusClass}">${item.status}</td><td data-label="Created">${formatTime(item.createdAt)}</td>`;
       analyticsTable.appendChild(row);
