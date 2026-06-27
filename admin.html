@@ -101,6 +101,14 @@ Complete Current
 </button>
 
 <button
+class="btn btn-primary"
+id="skipTokenBtn"
+>
+<i class="fa-solid fa-forward-step"></i>
+Skip Current
+</button>
+
+<button
 class="btn btn-danger"
 id="resetQueueBtn"
 >
@@ -115,6 +123,35 @@ id="exportBtn"
 <i class="fa-solid fa-file-export"></i>
 Export CSV
 </button>
+
+</div>
+
+</section>
+
+<section class="admin-container">
+
+<div class="management-grid">
+
+<div class="card">
+<h2>Manage Staff</h2>
+<form id="staffForm" class="form-grid">
+<input class="input" id="staffName" placeholder="Staff name" required>
+<input class="input" id="staffEmail" placeholder="Staff email" required>
+<input class="input" id="staffPhone" placeholder="Phone">
+<input class="input" id="staffPassword" placeholder="Password" type="password" required>
+<button class="btn btn-primary" type="submit">Add Staff</button>
+</form>
+<div id="staffList" class="state state-empty"></div>
+</div>
+
+<div class="card">
+<h2>Manage Counters</h2>
+<form id="counterForm" class="form-grid">
+<input class="input" id="counterName" placeholder="Counter name" required>
+<button class="btn btn-primary" type="submit">Add Counter</button>
+</form>
+<div id="counterList" class="state state-empty"></div>
+</div>
 
 </div>
 

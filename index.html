@@ -29,6 +29,7 @@ rel="stylesheet"
 <a href="#">Home</a>
 <a href="admin.html">Admin</a>
 <a href="analytics.html">Analytics</a>
+<a href="register.html">Register</a>
 </nav>
 
 </header>
@@ -42,13 +43,27 @@ Generate tokens, track queue status, estimate waiting time,
 and improve customer experience.
 </p>
 
-<button id="generateTokenBtn">
-Generate Token
-</button>
-
 <p id="tokenMessage" class="state state-empty" role="status" aria-live="polite">
-Generate a token to join queue
+Fill in customer details to generate a token
 </p>
+
+</section>
+
+<section class="admin-container">
+
+<div class="card">
+
+<h2>Customer Details</h2>
+
+<form id="customerQueueForm" class="form-grid">
+<input class="input" id="customerName" name="customerName" placeholder="Name" autocomplete="name" required>
+<input class="input" id="customerMobile" name="customerMobile" placeholder="Mobile Number" autocomplete="tel" required>
+<input class="input" id="customerEmail" name="customerEmail" placeholder="Email (optional)" autocomplete="email">
+<input class="input" id="customerPurpose" name="customerPurpose" placeholder="Purpose (optional)">
+<button class="btn btn-primary" id="generateTokenBtn" type="submit">Generate Token</button>
+</form>
+
+</div>
 
 </section>
 

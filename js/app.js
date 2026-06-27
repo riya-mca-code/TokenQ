@@ -1,6 +1,10 @@
 const MY_TOKEN_KEY = "myToken";
 
-const generateTokenBtn = document.getElementById("generateTokenBtn");
+const customerQueueForm = document.getElementById("customerQueueForm");
+const customerName = document.getElementById("customerName");
+const customerMobile = document.getElementById("customerMobile");
+const customerEmail = document.getElementById("customerEmail");
+const customerPurpose = document.getElementById("customerPurpose");
 const currentServing = document.getElementById("currentServing");
 const waitingCount = document.getElementById("waitingCount");
 const yourPosition = document.getElementById("yourPosition");
@@ -47,7 +51,7 @@ function renderDashboard(queue) {
 }
 
 async function refresh() {
-  queueTable.innerHTML = '<tr class="empty-row"><td colspan="3">Loading queue…</td></tr>';
+  queueTable.innerHTML = '<tr class="empty-row"><td colspan="3">Loading queue...</td></tr>';
   const data = await window.QueueAPI.request("/api/queue");
   const queue = data.queue || [];
   renderDashboard(queue);
@@ -56,7 +60,15 @@ async function refresh() {
 
 async function generateToken() {
   try {
-    const data = await window.QueueAPI.request("/api/queue", { method: "POST" });
+    const data = await window.QueueAPI.request("/api/queue", {
+      method: "POST",
+      body: {
+        customerName: customerName.value.trim(),
+        customerMobile: customerMobile.value.trim(),
+        customerEmail: customerEmail.value.trim(),
+        purpose: customerPurpose.value.trim(),
+      },
+    });
     const queue = data.queue || [];
     if (data.token?.token) {
       sessionStorage.setItem(MY_TOKEN_KEY, data.token.token);
@@ -74,4 +86,7 @@ refresh().catch(() => {});
 
 socket?.on("queue:update", () => refresh().catch(() => {}));
 
-generateTokenBtn?.addEventListener("click", generateToken);
+customerQueueForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  generateToken();
+});
