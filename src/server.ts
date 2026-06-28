@@ -10,7 +10,7 @@ import { hashPassword } from "./utils/password";
 async function seedSuperAdmin() {
   if (!env.superAdminEmail || !env.superAdminPassword) return;
   const email = env.superAdminEmail.toLowerCase();
-  const existing = await User.findOne({ email, role: "SUPER_ADMIN", deletedAt: null });
+  const existing = await User.findOne({ organizationId: null, email });
   if (existing) return;
 
   await User.create({
@@ -26,7 +26,9 @@ async function seedSuperAdmin() {
 }
 
 async function seedDemoOrganization() {
-  const organization = await Organization.findOne({ slug: "default-organization", deletedAt: null });
+  const organization = await Organization.findOne({
+    $or: [{ slug: "default-organization" }, { email: "owner@tokenq.local" }],
+  });
   if (organization) return organization;
 
   return Organization.create({
@@ -59,8 +61,9 @@ async function bootstrap() {
   const app = createApp();
   const server = http.createServer(app);
   initSocket(server);
+  const listenPort = env.nodeEnv === "development" ? 5000 : env.port;
 
-  server.listen(env.port, () => {
+  server.listen(listenPort, () => {
     emitToPlatform("system:ready", {
       status: "ready",
       timestamp: new Date().toISOString(),

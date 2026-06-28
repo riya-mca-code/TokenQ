@@ -1,62 +1,56 @@
 import mongoose from "mongoose";
-import { promises as dns } from "dns";
 import { env } from "./env";
 
 let cached = false;
 
-async function resolveSrvConnectionString(uri: string) {
+function toAtlasSeedListConnectionString(uri: string) {
   if (!uri.startsWith("mongodb+srv://")) return uri;
 
   const parsed = new URL(uri);
-  const hosts = await dns.resolveSrv(`_mongodb._tcp.${parsed.hostname}`);
-  if (!hosts.length) return uri;
-
-  const resolvedHosts = hosts
-    .sort((a, b) => (a.priority - b.priority) || (a.weight - b.weight))
-    .map((host) => `${host.name}:${host.port}`)
-    .join(",");
+  const parts = parsed.hostname.split(".");
+  if (parts.length < 3 || !parsed.hostname.endsWith(".mongodb.net")) return uri;
 
   const query = new URLSearchParams(parsed.search);
-  query.set("tls", query.get("tls") ?? "true");
-
-  try {
-    const txtRecords = await dns.resolveTxt(parsed.hostname);
-    const txtOptions = txtRecords
-      .flat()
-      .map((item) => item.trim())
-      .find((item) => item.length > 0);
-
-    if (txtOptions) {
-      const txtParams = new URLSearchParams(txtOptions);
-      for (const [key, value] of txtParams.entries()) {
-        if (!query.has(key)) {
-          query.set(key, value);
-        }
-      }
-    }
-  } catch {
-    // Atlas TXT records are optional for connectivity.
+  query.delete("ssl");
+  query.set("tls", "true");
+  if (!query.has("authSource")) {
+    query.set("authSource", "admin");
+  }
+  if (!query.has("replicaSet")) {
+    query.set("replicaSet", `atlas-${parts[1]}-shard-0`);
   }
 
-  return `mongodb://${resolvedHosts}${parsed.pathname}${query.toString() ? `?${query.toString()}` : ""}`;
+  const clusterName = parts[0];
+  const domain = parts.slice(1).join(".");
+  const hosts = [0, 1, 2].map((index) => `${clusterName}-shard-00-0${index}.${domain}:27017`).join(",");
+  const auth = parsed.username
+    ? `${encodeURIComponent(parsed.username)}${parsed.password ? `:${encodeURIComponent(parsed.password)}` : ""}@`
+    : "";
+
+  return `mongodb://${auth}${hosts}${parsed.pathname}${query.toString() ? `?${query.toString()}` : ""}`;
+}
+
+function getDevelopmentFallbackUri(uri: string) {
+  const parsed = new URL(uri);
+  const databaseName = parsed.pathname.replace(/^\/+/, "") || "tokenq";
+  return `mongodb://127.0.0.1:27017/${databaseName}`;
 }
 
 export async function connectDatabase() {
   if (cached || mongoose.connection.readyState === 1) return mongoose.connection;
 
+  const connectOptions = {
+    serverSelectionTimeoutMS: 5000,
+  };
+
   try {
-    await mongoose.connect(env.mongoUri);
+    await mongoose.connect(toAtlasSeedListConnectionString(env.mongoUri), connectOptions);
   } catch (error) {
-    if (env.mongoUri.startsWith("mongodb+srv://")) {
-      const fallbackUri = await resolveSrvConnectionString(env.mongoUri);
-      if (fallbackUri !== env.mongoUri) {
-        await mongoose.connect(fallbackUri);
-      } else {
-        throw error;
-      }
-    } else {
+    if (env.nodeEnv !== "development") {
       throw error;
     }
+
+    await mongoose.connect(getDevelopmentFallbackUri(env.mongoUri), connectOptions);
   }
 
   cached = true;
