@@ -1,5 +1,5 @@
 var R=require("../../chunks/ssr/[turbopack]_runtime.js")("server/app/reset-password/page.js")
-R.c("server/chunks/ssr/[root-of-the-server]__0o5lg_t._.js")
+R.c("server/chunks/ssr/[root-of-the-server]__0i0nxut._.js")
 R.c("server/chunks/ssr/node_modules_next_dist_esm_build_templates_app-page_1t2hgi9.js")
 R.c("server/chunks/ssr/[root-of-the-server]__1_kqtr4._.js")
 R.c("server/chunks/ssr/[root-of-the-server]__09khie0._.js")

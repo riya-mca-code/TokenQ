@@ -81,7 +81,7 @@ export async function forgotPasswordController(req: Request, res: Response, next
     const result = await forgotPassword({
       email: req.body.email,
       organizationSlug: req.body.organizationSlug,
-      origin: `${req.protocol}://${req.get("host")}`,
+      origin: env.clientUrl,
     });
     return sendSuccess(res, "If the account exists, a reset link has been sent", result || {});
   } catch (error) {
