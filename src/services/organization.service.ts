@@ -44,7 +44,7 @@ export async function getDashboardOverview(userId: string, organizationId: strin
 
   const [organization, staffCount, activeUsers] = await Promise.all([
     Organization.findById(organizationId).lean(),
-    User.countDocuments({ organizationId, role: { $in: ["ADMIN", "STAFF"] }, deletedAt: null }),
+    User.countDocuments({ organizationId, role: { $in: ["OWNER", "ADMIN", "STAFF"] }, deletedAt: null }),
     User.countDocuments({ organizationId, status: "ACTIVE", deletedAt: null }),
   ]);
 
@@ -59,7 +59,7 @@ export async function getDashboardOverview(userId: string, organizationId: strin
       organizationId,
       name: user?.name || "",
       email: user?.email || "",
-      role: user?.role || "ADMIN",
+      role: user?.role || "OWNER",
       status: user?.status || "ACTIVE",
     },
     organization: serializeOrganization(organization),

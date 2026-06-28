@@ -16,6 +16,8 @@ Unauthenticated users → Login.
 
 SUPER_ADMIN
 
+OWNER
+
 ADMIN
 
 STAFF
@@ -60,7 +62,7 @@ Super Admin
 
 /superadmin
 
-Admin
+Owner / Admin
 
 /dashboard
 
@@ -114,7 +116,7 @@ Staff
 
 ---
 
-## ADMIN
+## OWNER / ADMIN
 
 ✔ Dashboard
 
@@ -240,7 +242,7 @@ auth()
 
 staff()
 
-Admin
+Owner / Admin
 
 auth()
 

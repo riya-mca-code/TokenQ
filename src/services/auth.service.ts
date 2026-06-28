@@ -70,7 +70,7 @@ export async function registerOrganization(input: {
     email,
     phone: normalizeText(input.phone),
     passwordHash,
-    role: "ADMIN",
+    role: "OWNER",
     status: "ACTIVE",
     passwordChangedAt: new Date(),
   });
@@ -78,7 +78,7 @@ export async function registerOrganization(input: {
   const token = signAuthToken({
     id: String(user._id),
     organizationId: String(org._id),
-    role: "ADMIN",
+    role: "OWNER",
     email: user.email,
   });
 

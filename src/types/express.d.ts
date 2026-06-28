@@ -12,7 +12,7 @@ declare global {
 export interface AuthSession extends JwtPayload {
   id: string;
   organizationId: string | null;
-  role: "SUPER_ADMIN" | "ADMIN" | "STAFF";
+  role: "SUPER_ADMIN" | "OWNER" | "ADMIN" | "STAFF";
   email: string;
 }
 

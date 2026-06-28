@@ -58,7 +58,7 @@ export default function RegisterPage() {
   return (
     <AuthShell
       title="Create your organization"
-      description="Register a secure workspace and create the first admin account in one step."
+      description="Register a secure workspace and create the first owner account in one step."
     >
       <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
         <div className="space-y-2">
