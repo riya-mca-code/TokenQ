@@ -33,8 +33,6 @@ Storage (Future)
 
 NEXT_PUBLIC_API_URL=
 
-NEXT_PUBLIC_SOCKET_URL=
-
 ---
 
 ## Backend (.env)

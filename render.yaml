@@ -26,18 +26,6 @@ services:
         sync: false
       - key: SUPER_ADMIN_NAME
         sync: false
-      - key: DEFAULT_ORG_NAME
-        sync: false
-      - key: DEFAULT_ORG_TYPE
-        sync: false
-      - key: DEFAULT_OWNER_NAME
-        sync: false
-      - key: DEFAULT_ORG_EMAIL
-        sync: false
-      - key: DEFAULT_ORG_PHONE
-        sync: false
-      - key: DEFAULT_ORG_PASSWORD
-        sync: false
       - key: SMTP_HOST
         sync: false
       - key: SMTP_PORT

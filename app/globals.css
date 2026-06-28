@@ -5,6 +5,7 @@
 :root {
   --background: 248 250 252;
   --foreground: 15 23 42;
+  --font-sans: "ui-sans-serif", "system-ui", "sans-serif";
   --card: 255 255 255;
   --card-foreground: 15 23 42;
   --muted: 241 245 249;
