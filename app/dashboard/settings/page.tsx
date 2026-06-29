@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getSessionToken } from "@/lib/session";
 import { backendFetch } from "@/lib/backend";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,25 +8,34 @@ async function getSettingsData() {
   const token = await getSessionToken();
   if (!token) redirect("/login");
 
-  const response = await backendFetch("/api/v1/organizations/current", {}, token);
+  const response = await backendFetch("/api/v1/organizations/dashboard/overview", {}, token);
   const payload = await response.json();
   if (!response.ok) redirect("/login");
 
-  return payload.data.organization as {
-    name: string;
-    slug: string;
-    businessType: string;
-    ownerName: string;
-    email: string;
-    phone: string;
-    timezone: string;
-    branding: { displayName?: string; primaryColor?: string; accentColor?: string };
-    defaultWorkspace: { name: string; slug: string };
+  return payload.data as {
+    user: { role: string };
+    organization: {
+      name: string;
+      slug: string;
+      businessType: string;
+      ownerName: string;
+      email: string;
+      phone: string;
+      timezone: string;
+      branding: { displayName?: string; primaryColor?: string; accentColor?: string };
+      defaultWorkspace: { name: string; slug: string };
+    } | null;
   };
 }
 
 export default async function SettingsPage() {
-  const organization = await getSettingsData();
+  const data = await getSettingsData();
+
+  if (!data.organization || (data.user.role !== "OWNER" && data.user.role !== "ADMIN")) {
+    notFound();
+  }
+
+  const organization = data.organization;
 
   return (
     <div className="space-y-6">
